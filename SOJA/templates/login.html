@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Sistema Agrícola</title>
+    <style>
+        body { background-color: #e8f5e9; font-family: Arial; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .caja { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; }
+        input { display: block; margin: 15px auto; padding: 10px; width: 90%; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; width: 95%; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="caja">
+        <h2>Ingreso al Sistema</h2>
+        <form action="/login" method="POST">
+            <input type="text" name="username" placeholder="Usuario" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit">Ingresar</button>
+        </form>
+    </div>
+</body>
+</html>
