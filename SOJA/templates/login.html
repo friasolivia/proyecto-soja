@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ingreso - Monitoreo Agrícola Soja</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f1; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: #ffffff; padding: 36px 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 360px; border-top: 6px solid #2e7d32; }
+        h2 { margin-top: 0; color: #1b5e20; text-align: center; }
+        p.sub { text-align: center; color: #555; font-size: 0.9rem; margin-bottom: 24px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; font-size: 0.9rem; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin-bottom: 18px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 0.95rem; }
+        button { width: 100%; padding: 11px; background-color: #2e7d32; color: white; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #1b5e20; }
+        .error { background-color: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; border: 1px solid #ef9a9a; margin-bottom: 16px; font-size: 0.88rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>Proyecto Soja</h2>
+        <p class="sub">Tablero de Control y Monitoreo Agrícola</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <label for="username">Usuario</label>
+            <input type="text" id="username" name="username" placeholder="Ej: olivia" required>
+
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" placeholder="Ingrese su clave" required>
+
+            <button type="submit">Ingresar al Tablero</button>
+        </form>
+    </div>
+</body>
+</html>
