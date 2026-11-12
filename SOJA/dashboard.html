@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nivel 1: Tablero General - Proyecto Soja</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; color: #222; }
+        header { background-color: #1b5e20; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 1100px; margin: 25px auto; padding: 0 20px; }
+        .breadcrumb { font-size: 0.9rem; color: #555; margin-bottom: 18px; font-weight: 600; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 26px; }
+        .kpi-card { background: white; padding: 18px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); border-left: 5px solid #4f81bd; }
+        .kpi-card h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: #666; text-transform: uppercase; }
+        .kpi-card .valor { font-size: 1.6rem; font-weight: bold; color: #222; }
+        .card { background: white; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        h2 { margin-top: 0; color: #1f497d; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th { background-color: #4f81bd; color: white; text-align: left; padding: 12px; font-size: 0.95rem; }
+        td { padding: 12px; border-bottom: 1px solid #e0e0e0; background-color: #e9edf4; }
+        tr:nth-child(even) td { background-color: #d0d8e8; }
+        .dot { display: inline-block; width: 13px; height: 13px; border-radius: 50%; margin-right: 6px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.25); }
+        .VERDE { background-color: #2ecc71; }
+        .AMARILLO { background-color: #f1c40f; }
+        .ROJO { background-color: #e74c3c; }
+        .btn-accion { text-decoration: none; color: #1f497d; font-weight: bold; padding: 6px 10px; border-radius: 4px; background: rgba(255,255,255,0.7); }
+        .btn-accion:hover { background: #ffffff; text-decoration: underline; }
+        .referencia-box { display: flex; gap: 24px; background: #fff; padding: 16px 22px; border-radius: 8px; border: 1px solid #dcdfe6; font-size: 0.9rem; }
+        .logout-link { color: #ffebee; text-decoration: none; font-weight: bold; font-size: 0.9rem; border: 1px solid #a5d6a7; padding: 6px 12px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <strong>PROYECTO SOJA</strong> | Tablero de Monitoreo Agrícola
+        </div>
+        <div>
+            Operador: {{ session['usuario'] }} ({{ session['rol'] }}) &nbsp;|&nbsp;
+            <a class="logout-link" href="{{ url_for('logout') }}">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">Ubicación actual: Nivel 1 - Dashboard General de Lotes</div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <h4>Superficie Total</h4>
+                <div class="valor">{{ kpis.total_hectareas }} ha</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: #2ecc71;">
+                <h4>Lotes en Estado Normal</h4>
+                <div class="valor">{{ kpis.cant_verde }} Lotes</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: #f1c40f;">
+                <h4>Lotes en Advertencia</h4>
+                <div class="valor">{{ kpis.cant_amarillo }} Lote</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: #e74c3c;">
+                <h4>Lotes en Estado Crítico</h4>
+                <div class="valor">{{ kpis.cant_rojo }} Lote</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Estado Global de Lotes de Soja (Nivel 1)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Lote</th>
+                        <th>Superficie</th>
+                        <th>Labor Actual</th>
+                        <th>Fecha Límite</th>
+                        <th>Estado</th>
+                        <th>Alerta</th>
+                        <th>Acción (Drill-Down)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lote in lotes %}
+                    <tr>
+                        <td><strong>{{ lote.codigo_lote }}</strong></td>
+                        <td>{{ lote.superficie_ha | int }} ha</td>
+                        <td>{{ lote.tipo_labor }}</td>
+                        <td>{{ lote.fecha_limite_fmt }}</td>
+                        <td>
+                            <span class="dot {{ lote.color_semaforo }}"></span>
+                            {{ lote.estado_labor }}
+                        </td>
+                        <td>
+                            <span class="dot {{ lote.color_semaforo }}"></span>
+                            {{ lote.alerta_corta }}
+                        </td>
+                        <td>
+                            <a class="btn-accion" href="{{ url_for('ver_lote', id_lote=lote.id_lote) }}">[ Ver Ficha ]</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="referencia-box">
+            <strong>Referencia de Semaforización:</strong>
+            <span><span class="dot VERDE"></span> <strong>Verde (Normal):</strong> Labor finalizada o en fecha programada.</span>
+            <span><span class="dot AMARILLO"></span> <strong>Amarillo (Advertencia):</strong> Labor pendiente próxima a vencer.</span>
+            <span><span class="dot ROJO"></span> <strong>Rojo (Crítico):</strong> Labor atrasada o frenada por riesgo agronómico.</span>
+        </div>
+    </div>
+</body>
+</html>
