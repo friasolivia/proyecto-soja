@@ -196,8 +196,7 @@ def ver_detalle_labor(id_labor):
             i.categoria AS categoria_insumo,
             i.dosis_referencia,
             c.razon_social AS contratista_nombre,
-            c.maquinaria_principal,
-            c.telefono_contacto
+            c.maquinaria_principal
         FROM labores lb
         INNER JOIN lotes l ON lb.id_lote = l.id_lote
         LEFT JOIN insumos i ON lb.id_insumo = i.id_insumo
