@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 import mysql.connector
 
 app = Flask(__name__)
@@ -16,22 +16,6 @@ DB_CONFIG = {
 def obtener_conexion():
     return mysql.connector.connect(**DB_CONFIG)
 
-def asegurar_hash_werkzeug():
-    """Garantiza que el usuario inicial tenga un hash válido de werkzeug.security en la BD."""
-    conn = obtener_conexion()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT id_usuario, password_hash FROM usuarios WHERE username = 'olivia'")
-    usuario = cursor.fetchone()
-    if usuario and not ('$' in usuario['password_hash']):
-        nuevo_hash = generate_password_hash('1234')
-        cursor.execute(
-            "UPDATE usuarios SET password_hash = %s WHERE id_usuario = %s",
-            (nuevo_hash, usuario['id_usuario'])
-        )
-        conn.commit()
-    cursor.close()
-    conn.close()
-
 
 @app.route('/', methods=['GET'])
 def inicio():
@@ -43,8 +27,6 @@ def login():
     if request.method == 'POST':
         username_ingresado = request.form.get('username')
         password_ingresada = request.form.get('password')
-
-        asegurar_hash_werkzeug()
 
         conn = obtener_conexion()
         cursor = conn.cursor(dictionary=True)
@@ -78,7 +60,6 @@ def dashboard():
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
-
     query_lotes = """
         SELECT 
             l.id_lote,
@@ -96,7 +77,6 @@ def dashboard():
     """
     cursor.execute(query_lotes)
     lotes = cursor.fetchall()
-
 
     query_kpis = """
         SELECT 
@@ -126,10 +106,8 @@ def ver_lote(id_lote):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
-    
     cursor.execute("SELECT * FROM lotes WHERE id_lote = %s", (id_lote,))
     lote = cursor.fetchone()
-
 
     query_labores = """
         SELECT 
@@ -162,7 +140,6 @@ def ver_detalle_labor(id_labor):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
-    
     query_detalle = """
         SELECT 
             lb.id_labor,
