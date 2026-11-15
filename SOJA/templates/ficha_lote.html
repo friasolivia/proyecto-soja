@@ -2,52 +2,220 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Nivel 2: Ficha del Lote {{ lote.codigo_lote }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivel 2 — Ficha del Lote {{ lote.codigo_lote }} | Proyecto Soja</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; color: #222; }
-        header { background-color: #1b5e20; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
-        .container { max-width: 1050px; margin: 25px auto; padding: 0 20px; }
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-        .breadcrumb { font-size: 0.9rem; color: #555; font-weight: 600; }
-        .btn-drillup { background-color: #4f81bd; color: white; text-decoration: none; padding: 8px 16px; border-radius: 5px; font-weight: bold; font-size: 0.9rem; }
-        .btn-drillup:hover { background-color: #385d8a; }
-        .card { background: white; padding: 26px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        h2 { margin-top: 0; color: #1f497d; }
-        .meta-lote { background: #eef3f9; padding: 14px 18px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #4f81bd; font-size: 0.98rem; }
-        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        th { background-color: #4f81bd; color: white; text-align: left; padding: 12px; }
-        td { padding: 12px; border-bottom: 1px solid #e0e0e0; background-color: #e9edf4; }
-        tr:nth-child(even) td { background-color: #d0d8e8; }
-        .dot { display: inline-block; width: 13px; height: 13px; border-radius: 50%; margin-right: 6px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.25); }
-        .VERDE { background-color: #2ecc71; }
-        .AMARILLO { background-color: #f1c40f; }
-        .ROJO { background-color: #e74c3c; }
-        .btn-accion { text-decoration: none; color: #1f497d; font-weight: bold; padding: 6px 10px; border-radius: 4px; background: rgba(255,255,255,0.7); }
-        .btn-accion:hover { background: #ffffff; text-decoration: underline; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: #F5F4F0;
+            color: #181818;
+            padding: 24px;
+        }
+        .page { max-width: 1160px; margin: 0 auto; }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 16px 24px;
+            background: #FFFFFF;
+            border-radius: 999px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+        .breadcrumbs {
+            font-size: 0.85rem;
+            color: #7A7974;
+        }
+        .breadcrumbs a {
+            color: #181818;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .btn-back {
+            text-decoration: none;
+            background: #1C1C1C;
+            color: #FFFFFF;
+            padding: 10px 22px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .btn-back:hover { opacity: 0.85; }
+
+        .header-banner {
+            background: #1C1C1C;
+            color: #FFFFFF;
+            border-radius: 24px;
+            padding: 44px 48px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .header-banner .kicker {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9E9D97;
+            margin-bottom: 8px;
+        }
+        .header-banner h1 {
+            font-size: 3.4rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+
+        /* Métricas del lote estilo 1200 m² */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 28px;
+            margin-bottom: 48px;
+            padding: 0 8px;
+        }
+        .spec-item {
+            border-bottom: 1.5px solid #D8D6CE;
+            padding-bottom: 16px;
+        }
+        .spec-item .label {
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #7A7974;
+            margin-bottom: 8px;
+        }
+        .spec-item .val {
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .section-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.03);
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 28px;
+        }
+        .section-header h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        .section-header span {
+            font-size: 0.82rem;
+            color: #7A7974;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #7A7974;
+            padding: 14px 16px;
+            border-bottom: 1.5px solid #181818;
+        }
+        td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #EAE8E1;
+            font-size: 0.94rem;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+        .VERDE { background-color: #16A34A; }
+        .AMARILLO { background-color: #D97706; }
+        .ROJO { background-color: #DC2626; }
+        .badge-VERDE { background: #ECFDF5; color: #065F46; }
+        .badge-AMARILLO { background: #FFFBEB; color: #92400E; }
+        .badge-ROJO { background: #FEF2F2; color: #991B1B; }
+
+        .btn-drill {
+            display: inline-block;
+            text-decoration: none;
+            background: #1C1C1C;
+            color: #FFFFFF;
+            padding: 9px 20px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .btn-drill:hover { background: #3A3A3A; }
+
+        @media (max-width: 860px) {
+            .specs-grid { grid-template-columns: 1fr 1fr; }
+            .top-nav { flex-direction: column; gap: 12px; border-radius: 20px; }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div><strong>PROYECTO SOJA</strong> | Nivel 2: Ficha Técnica de Lote</div>
-        <div>Operador: {{ session['usuario'] }}</div>
-    </header>
-
-    <div class="container">
-        <div class="nav-bar">
-            <div class="breadcrumb">
-                <a href="{{ url_for('dashboard') }}">Nivel 1: Dashboard</a> &raquo; Nivel 2: Ficha del Lote {{ lote.codigo_lote }}
+    <div class="page">
+        <nav class="top-nav">
+            <div class="breadcrumbs">
+                <a href="/dashboard">Nivel 1: Dashboard</a> &nbsp;/&nbsp; <span>Nivel 2: Ficha del Lote {{ lote.codigo_lote }}</span>
             </div>
-            <a class="btn-drillup" href="{{ url_for('dashboard') }}">&larr; Volver al Tablero General (Drill-Up)</a>
-        </div>
+            <a href="/dashboard" class="btn-back">← Volver al Tablero General (Drill-Up)</a>
+        </nav>
 
-        <div class="card">
-            <h2>Ficha del Lote {{ lote.codigo_lote }}</h2>
-            <div class="meta-lote">
-                📍 <strong>Detalles del Lote: {{ lote.codigo_lote }}</strong><br>
-                Superficie: {{ lote.superficie_ha | int }} hectáreas &nbsp;|&nbsp;
-                Tipo de Suelo: {{ lote.tipo_suelo }} &nbsp;|&nbsp;
-                Coordenadas: {{ lote.coordenadas }} &nbsp;|&nbsp;
-                Rendimiento Esperado: {{ lote.rendimiento_esperado_tn_ha }}
+        <header class="header-banner">
+            <div>
+                <div class="kicker">Nivel 2 · Desglose Técnico por Lote</div>
+                <h1>Lote {{ lote.codigo_lote }}</h1>
+            </div>
+            <div style="font-size: 0.9rem; color: #B5B4AE;">
+                Operador en sesión: <strong style="color:#FFF;">{{ session['usuario'] }}</strong>
+            </div>
+        </header>
+
+        <section class="specs-grid">
+            <div class="spec-item">
+                <div class="label">Superficie Asignada</div>
+                <div class="val">{{ lote.superficie_ha }} hectáreas</div>
+            </div>
+            <div class="spec-item">
+                <div class="label">Clasificación de Suelo</div>
+                <div class="val">{{ lote.tipo_suelo }}</div>
+            </div>
+            <div class="spec-item">
+                <div class="label">Coordenadas Geográficas</div>
+                <div class="val" style="font-size: 1.15rem;">{{ lote.coordenadas }}</div>
+            </div>
+            <div class="spec-item">
+                <div class="label">Rendimiento Esperado</div>
+                <div class="val">{{ lote.rendimiento_esperado_tn_ha }}</div>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <div class="section-header">
+                <h2>Cronograma e Historial de Labores del Lote</h2>
+                <span>Seleccione una labor para auditar insumos y contratista (Drill-Down a Nivel 3)</span>
             </div>
 
             <table>
@@ -56,8 +224,8 @@
                         <th>Fecha Límite</th>
                         <th>Tipo de Labor</th>
                         <th>Insumo Principal</th>
-                        <th>Estado</th>
-                        <th>Acción (Ir a Nivel 3)</th>
+                        <th>Estado Operativo</th>
+                        <th>Detalle Transaccional</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,17 +235,19 @@
                         <td>{{ lb.tipo_labor }}</td>
                         <td>{{ lb.insumo_principal }}</td>
                         <td>
-                            <span class="dot {{ lb.color_semaforo }}"></span>
-                            {{ lb.estado_labor }} ({{ lb.alerta_corta }})
+                            <span class="status-pill badge-{{ lb.color_semaforo }}">
+                                <span class="dot {{ lb.color_semaforo }}"></span>
+                                {{ lb.estado_labor }} ({{ lb.alerta_corta }})
+                            </span>
                         </td>
                         <td>
-                            <a class="btn-accion" href="{{ url_for('ver_detalle_labor', id_labor=lb.id_labor) }}">[ Ver Detalle ]</a>
+                            <a href="/labor/{{ lb.id_labor }}" class="btn-drill">Ver detalle →</a>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
+        </section>
     </div>
 </body>
 </html>
