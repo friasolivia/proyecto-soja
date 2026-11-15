@@ -1,21 +1,26 @@
+import os
+import hashlib
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import check_password_hash
 import mysql.connector
-import hashlib
 
 app = Flask(__name__)
-app.secret_key = 'clave_secreta_proyecto_soja_uai'
+app.secret_key = os.environ.get('SECRET_KEY', 'clave_secreta_proyecto_soja_uai')
 
 DB_CONFIG = {
-    'host': 'bs4lgmqg2rgcpzv1f809-mysql.services.clever-cloud.com',
-    'user': 'u42qg5dgtkmlowjm',
-    'password': '8lzAyn6q68739yal2CjO',
-    'database': 'bs4lgmqg2rgcpzv1f809',
-    'port': 3306
+    'host': os.environ.get('DB_HOST', 'bs4lgmqg2rgcpzv1f809-mysql.services.clever-cloud.com'),
+    'user': os.environ.get('DB_USER', 'u42qg5dgtkmlowjm'),
+    'password': os.environ.get('DB_PASSWORD', '8lzAyn6q68739yal2CjO'),
+    'database': os.environ.get('DB_NAME', 'bs4lgmqg2rgcpzv1f809'),
+    'port': int(os.environ.get('DB_PORT', 3306))
 }
 
 def obtener_conexion():
     return mysql.connector.connect(**DB_CONFIG)
+
+@app.route('/', methods=['GET'])
+def inicio():
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -50,12 +55,6 @@ def login():
 
     return render_template('login.html', error=error)
 
-
-@app.route('/', methods=['GET'])
-def inicio():
-    return redirect(url_for('login'))
-
-
 @app.route('/logout')
 def logout():
     session.clear()
@@ -68,7 +67,6 @@ def dashboard():
 
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
-
 
     query_lotes = """
         SELECT 
@@ -87,7 +85,6 @@ def dashboard():
     """
     cursor.execute(query_lotes)
     lotes = cursor.fetchall()
-
 
     query_kpis = """
         SELECT 
@@ -108,7 +105,6 @@ def dashboard():
 
     return render_template('dashboard.html', lotes=lotes, kpis=kpis)
 
-
 @app.route('/lote/<int:id_lote>')
 def ver_lote(id_lote):
     if 'usuario' not in session:
@@ -117,10 +113,8 @@ def ver_lote(id_lote):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
-    
     cursor.execute("SELECT * FROM lotes WHERE id_lote = %s", (id_lote,))
     lote = cursor.fetchone()
-
 
     query_labores = """
         SELECT 
@@ -144,7 +138,6 @@ def ver_lote(id_lote):
 
     return render_template('ficha_lote.html', lote=lote, labores=labores)
 
-
 @app.route('/labor/<int:id_labor>')
 def ver_detalle_labor(id_labor):
     if 'usuario' not in session:
@@ -153,7 +146,6 @@ def ver_detalle_labor(id_labor):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
-    
     query_detalle = """
         SELECT 
             lb.id_labor,
