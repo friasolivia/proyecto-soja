@@ -1,6 +1,6 @@
 import os
 import hashlib
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, abort
 from werkzeug.security import check_password_hash
 import mysql.connector
 
@@ -100,10 +100,37 @@ def dashboard():
     cursor.execute(query_kpis)
     kpis = cursor.fetchone()
 
+    # Datos del gráfico: hectáreas y cantidad de lotes por color de semáforo
+    query_grafico = """
+        SELECT
+            lb.color_semaforo AS color,
+            COUNT(*) AS cant_lotes,
+            SUM(l.superficie_ha) AS hectareas
+        FROM lotes l
+        INNER JOIN labores lb ON l.id_lote = lb.id_lote
+        WHERE lb.es_labor_actual = TRUE
+        GROUP BY lb.color_semaforo
+    """
+    cursor.execute(query_grafico)
+    filas = {f['color']: f for f in cursor.fetchall()}
+
     cursor.close()
     conn.close()
 
-    return render_template('dashboard.html', lotes=lotes, kpis=kpis)
+    total = float(kpis['total_hectareas'] or 0)
+    grafico = []
+    for color, etiqueta in (('VERDE', 'Normal'), ('AMARILLO', 'Advertencia'), ('ROJO', 'Crítico')):
+        fila = filas.get(color)
+        ha = float(fila['hectareas']) if fila else 0.0
+        grafico.append({
+            'color': color,
+            'etiqueta': etiqueta,
+            'lotes': int(fila['cant_lotes']) if fila else 0,
+            'hectareas': ha,
+            'porcentaje': round(ha * 100 / total, 1) if total else 0
+        })
+
+    return render_template('dashboard.html', lotes=lotes, kpis=kpis, grafico=grafico)
 
 @app.route('/lote/<int:id_lote>')
 def ver_lote(id_lote):
@@ -115,6 +142,10 @@ def ver_lote(id_lote):
 
     cursor.execute("SELECT * FROM lotes WHERE id_lote = %s", (id_lote,))
     lote = cursor.fetchone()
+    if not lote:
+        cursor.close()
+        conn.close()
+        abort(404)
 
     query_labores = """
         SELECT 
@@ -178,6 +209,8 @@ def ver_detalle_labor(id_labor):
 
     cursor.close()
     conn.close()
+    if not detalle:
+        abort(404)
 
     return render_template('detalle_labor.html', detalle=detalle)
 
