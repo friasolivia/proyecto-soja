@@ -158,14 +158,14 @@
             <div class="error-box">{{ error }}</div>
             {% endif %}
 
-            <form method="POST" action="/login">
+            <form method="POST" action="/login" autocomplete="off">
                 <div class="field">
                     <label for="username">Usuario</label>
-                    <input type="text" id="username" name="username" placeholder="Ej. olivia" required>
+                    <input type="text" id="username" name="username" placeholder="Ingrese su usuario" autocomplete="off" required>
                 </div>
                 <div class="field">
                     <label for="password">Contraseña</label>
-                    <input type="password" id="password" name="password" placeholder="••••" required>
+                    <input type="password" id="password" name="password" placeholder="Ingrese su contraseña" autocomplete="new-password" required>
                 </div>
                 <button type="submit" class="btn-pill">Acceder al tablero</button>
             </form>
