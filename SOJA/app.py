@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import check_password_hash
 import mysql.connector
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_proyecto_soja_uai'
@@ -16,6 +17,39 @@ DB_CONFIG = {
 def obtener_conexion():
     return mysql.connector.connect(**DB_CONFIG)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        username_ingresado = request.form.get('username')
+        password_ingresada = request.form.get('password')
+
+        conn = obtener_conexion()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT id_usuario, username, password_hash, nombre_completo, rol FROM usuarios WHERE username = %s",
+            (username_ingresado,)
+        )
+        usuario_db = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        hash_guardado = usuario_db['password_hash'] if usuario_db else ''
+        es_valida = (
+            check_password_hash(hash_guardado, password_ingresada)
+            if '$' in hash_guardado
+            else hash_guardado == hashlib.sha256(password_ingresada.encode()).hexdigest()
+        )
+
+        if usuario_db and es_valida:
+            session['usuario'] = usuario_db['nombre_completo']
+            session['rol'] = usuario_db['rol']
+            return redirect(url_for('dashboard'))
+        else:
+            error = "Credenciales incorrectas. Verifique su usuario y contraseña."
+
+    return render_template('login.html', error=error)
+
 
 @app.route('/', methods=['GET'])
 def inicio():
@@ -27,6 +61,8 @@ def login():
     if request.method == 'POST':
         username_ingresado = request.form.get('username')
         password_ingresada = request.form.get('password')
+
+        asegurar_hash_werkzeug()
 
         conn = obtener_conexion()
         cursor = conn.cursor(dictionary=True)
@@ -60,6 +96,7 @@ def dashboard():
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
+
     query_lotes = """
         SELECT 
             l.id_lote,
@@ -77,6 +114,7 @@ def dashboard():
     """
     cursor.execute(query_lotes)
     lotes = cursor.fetchall()
+
 
     query_kpis = """
         SELECT 
@@ -106,8 +144,10 @@ def ver_lote(id_lote):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
+    
     cursor.execute("SELECT * FROM lotes WHERE id_lote = %s", (id_lote,))
     lote = cursor.fetchone()
+
 
     query_labores = """
         SELECT 
@@ -140,6 +180,7 @@ def ver_detalle_labor(id_labor):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
+    
     query_detalle = """
         SELECT 
             lb.id_labor,
